@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CategoryStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -12,7 +14,7 @@ class StoreCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +25,9 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255'],
+            'image' => ['nullable', 'string'],
+            'status' => ['required', new Enum(CategoryStatus::class)],
         ];
     }
 }
