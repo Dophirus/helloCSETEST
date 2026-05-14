@@ -87,4 +87,23 @@ class ProductApiTest extends TestCase
         // On verifie que le produit est bien supprimé
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
     }
+
+    public function test_can_filter_products_by_category(): void
+    {
+        // On crée 2 categories
+        $cat1 = Category::factory()->create();
+        $cat2 = Category::factory()->create();
+
+        // On crée 2 produits
+        Product::factory()->create(['category_id' => $cat1->id]);
+        Product::factory()->create(['category_id' => $cat2->id]);
+
+        // On demande uniquement la catégorie 1
+        $response = $this->getJson("/api/products?category_id={$cat1->id}");
+
+        // On verifie que les données sont bien créées
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.category_id', $cat1->id);
+    }
 }

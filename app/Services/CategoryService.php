@@ -27,4 +27,11 @@ class CategoryService
     {
         return $category->delete();
     }
+
+    public function getCategoriesWithOnlineProductsCount(): Collection
+    {
+        return \App\Models\Category::withCount(['products as products_count' => function ($query) {
+            $query->where('status', \App\Enums\ProductStatus::ONLINE);
+        }])->get();
+    }
 }

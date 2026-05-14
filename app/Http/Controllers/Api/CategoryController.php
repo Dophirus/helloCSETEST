@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = $this->categoryService->getAllCategories();
+        $categories = $this->categoryService->getCategoriesWithOnlineProductsCount();
         return CategoryResource::collection($categories);
     }
 

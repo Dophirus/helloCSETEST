@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\CategoryStatus;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -144,5 +145,23 @@ class CategoryApiTest extends TestCase
         // On attend une erreur
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['status']);
+    }
+
+    public function test_category_index_shows_online_products_count(): void
+    {
+        // On crée une categorie
+        $category = Category::factory()->create();
+
+        // 2 produits en ligne, 1 désactivé
+        Product::factory()->create(['category_id' => $category->id, 'status' => \App\Enums\ProductStatus::ONLINE]);
+        Product::factory()->create(['category_id' => $category->id, 'status' => \App\Enums\ProductStatus::ONLINE]);
+        Product::factory()->create(['category_id' => $category->id, 'status' => \App\Enums\ProductStatus::DISABLED]);
+
+        // On envoie la requete
+        $response = $this->getJson('/api/categories');
+
+        // On verifie que les données sont bien créées
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.products_online_count', 2);
     }
 }
